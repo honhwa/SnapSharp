@@ -4023,6 +4023,8 @@ Media Foundation：{2}
   <data name="RecognitionOcrHint" xml:space="preserve"><value>辨識圖片中的文字，可編輯結果、翻譯，或對照查看原文與譯文。</value></data>
   <data name="RecognitionSummaryHint" xml:space="preserve"><value>先辨識圖片文字，再使用本機模型產生摘要。展開「原文」可核對辨識內容，下方摘要支援編輯、複製和匯出。</value></data>
   <data name="RecognitionBarcodeHint" xml:space="preserve"><value>在本機解碼 QR Code 和條碼，可核對、編輯解碼內容，然後複製或匯出。</value></data>
+  <data name="CaptureQrOpenLink" xml:space="preserve"><value>偵測到 QR Code 網址：&#10;&#10;{0}&#10;&#10;是否使用預設瀏覽器開啟？</value></data>
+  <data name="CaptureQrCopied" xml:space="preserve"><value>QR Code 內容已複製到剪貼簿。</value></data>
   <data name="RecognitionFormulaHint" xml:space="preserve"><value>將圖片中的公式辨識為可編輯的 LaTeX，支援複製或匯出為 .tex / .txt 檔案。</value></data>
   <data name="RecognitionTableHint" xml:space="preserve"><value>辨識表格列欄與合併儲存格。可在下方校正儲存格、複製 CSV，或匯出 CSV / Excel。列欄編號從 1 開始。</value></data>
 </root>

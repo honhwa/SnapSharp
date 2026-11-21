@@ -36,4 +36,7 @@ public enum CaptureAction
 }
 
 public sealed record CaptureResult(BitmapSource Image, Rectangle ScreenBounds, Rectangle PixelRegion,
-    CaptureAction Action = CaptureAction.Copy);
+    CaptureAction Action = CaptureAction.Copy)
+{
+    public CaptureMode Mode { get; init; } = CaptureMode.Region;
+}

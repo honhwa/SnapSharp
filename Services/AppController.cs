@@ -18,6 +18,7 @@ public sealed class AppController : IDisposable
     private readonly SkiaImageService _images;
     private readonly HistoryService _history;
     private readonly IClipboardService _clipboard;
+    private readonly LocalRecognitionService _captureRecognition = new();
     private readonly PluginCatalog _plugins;
     private readonly StartupRegistrationService _startup = new();
     private readonly List<Window> _openWindows = [];
@@ -32,6 +33,7 @@ public sealed class AppController : IDisposable
     private readonly CancellationTokenSource _lifetime = new();
     private bool _disposed;
     private bool _captureBackendRefreshPending;
+    private long _captureRequestId;
 
     public AppController()
     {
@@ -171,6 +173,7 @@ public sealed class AppController : IDisposable
         if (_settingsWindow is not null) { _tray.ShowMessage(L.Get("Settings"), L.Get("CloseSettingsBeforeStartingACapture")); return; }
         CancelDelayedScreenshot(showMessage: false);
         if (_capture.IsActive) return;
+        ++_captureRequestId;
         try
         {
             if (_captureBackendRefreshPending)
@@ -277,7 +280,7 @@ public sealed class AppController : IDisposable
         if (showMessage) _tray.ShowMessage(L.Get("DelayedCapture"), L.Get("DelayedCaptureCanceled"));
     }
 
-    private void OnCaptureCompleted(object? sender, CaptureResult result)
+    private async void OnCaptureCompleted(object? sender, CaptureResult result)
     {
         if (result.Action == CaptureAction.Recording)
         {
@@ -306,8 +309,25 @@ public sealed class AppController : IDisposable
 
         if (result.Action == CaptureAction.Copy)
         {
-            _clipboard.SetImage(result.Image);
-            _tray.ShowMessage(L.Get("CaptureComplete"), L.Get("ImageCopiedToClipboard"));
+            var requestId = _captureRequestId;
+            if (result.Mode != CaptureMode.Region)
+            {
+                string? text = null;
+                try { text = await _captureRecognition.ReadQrCode(result.Image, _settings.Current.BarcodeRotate, _lifetime.Token); }
+                catch (OperationCanceledException) when (_disposed) { return; }
+                catch (Exception ex) { System.Diagnostics.Trace.TraceWarning("Screenshot QR recognition failed ({0}).", ex.GetType().Name); }
+                if (_disposed || requestId != _captureRequestId) return;
+                // Direct captures have no selection overlay to close or return to.
+                if (!string.IsNullOrEmpty(text) && CaptureQrActions.Handle(text, null, () => { },
+                    status => _tray.ShowMessage(L.Get("CaptureComplete"), status)).Copied) return;
+            }
+            if (_disposed || requestId != _captureRequestId) return;
+            try
+            {
+                _clipboard.SetImage(result.Image);
+                _tray.ShowMessage(L.Get("CaptureComplete"), L.Get("ImageCopiedToClipboard"));
+            }
+            catch (Exception ex) { _tray.ShowMessage(L.Get("CopyFailed"), ex.Message, System.Windows.Forms.ToolTipIcon.Warning); }
             return;
         }
 

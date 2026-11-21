@@ -107,7 +107,7 @@ public sealed class CaptureCoordinator
 
     private void Present(PreparedCapture capture, CaptureMode mode, bool scrollingSelection)
     {
-        if (mode != CaptureMode.Region) { CompleteDirectCapture(capture.Screen); return; }
+        if (mode != CaptureMode.Region) { CompleteDirectCapture(capture.Screen, mode); return; }
         var screens = new[] { capture.Screen };
         var candidates = capture.Candidates;
         foreach (var screen in screens)
@@ -128,10 +128,10 @@ public sealed class CaptureCoordinator
         }
     }
 
-    private void CompleteDirectCapture(CapturedScreen capture)
+    private void CompleteDirectCapture(CapturedScreen capture, CaptureMode mode)
     {
         CaptureCompleted?.Invoke(this, new CaptureResult(capture.Image, capture.Bounds,
-            new System.Drawing.Rectangle(0, 0, capture.Bounds.Width, capture.Bounds.Height)));
+            new System.Drawing.Rectangle(0, 0, capture.Bounds.Width, capture.Bounds.Height)) { Mode = mode });
     }
 
     private void OnPrecisionPreferencesChanged(object? sender, EventArgs e)

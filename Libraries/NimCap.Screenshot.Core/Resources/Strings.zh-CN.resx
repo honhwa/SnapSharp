@@ -3923,6 +3923,8 @@ Media Foundation：{2}
   <data name="CaptureSummaryEmptyResult" xml:space="preserve"><value>模型未返回总结，请重试。</value></data>
   <data name="CaptureSummaryTimedOut" xml:space="preserve"><value>总结超时，截图已保留，可点击重试。</value></data>
   <data name="CaptureSummaryCopied" xml:space="preserve"><value>总结已复制到剪贴板。</value></data>
+  <data name="CaptureQrOpenLink" xml:space="preserve"><value>检测到二维码网址：&#10;&#10;{0}&#10;&#10;是否用默认浏览器打开？</value></data>
+  <data name="CaptureQrCopied" xml:space="preserve"><value>二维码内容已复制到剪贴板。</value></data>
   <data name="RecognitionOcrHint" xml:space="preserve"><value>识别图片中的文字，可编辑结果、翻译，或对照查看原文与译文。</value></data>
   <data name="RecognitionSummaryHint" xml:space="preserve"><value>先识别图片文字，再使用本地模型生成摘要。展开“原文”可核对识别内容，下方摘要支持编辑、复制和导出。</value></data>
   <data name="RecognitionBarcodeHint" xml:space="preserve"><value>在本地解码二维码和一维码，可核对、编辑解码内容，然后复制或导出。</value></data>

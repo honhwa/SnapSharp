@@ -59,6 +59,7 @@ public partial class SelectionWindow : Window
         _elementDetectionService = elementDetectionService ?? new ElementDetectionService();
         InitializeComponent();
         InitializeTextRecognition();
+        Closed += (_, _) => CancelQrScan();
         _scrollingSelection = scrollingSelection;
         if (scrollingSelection)
         {
@@ -219,6 +220,8 @@ public partial class SelectionWindow : Window
 
     private void RestartRegionSelection()
     {
+        CancelQrScan();
+        _lastQrText = null;
         ExitTextRecognition();
         _redaction.Cancel();
         _pixelNudgeActive = false;
@@ -470,6 +473,7 @@ public partial class SelectionWindow : Window
         }
         _pixelSelection = nextSelection;
         UpdateEditorSurface();
+        ScanSelectionQr();
     }
 
     private void UpdateEditorSurface()
@@ -777,10 +781,20 @@ public partial class SelectionWindow : Window
     }
     private void Cancel_Click(object sender, RoutedEventArgs e) => CaptureCanceled?.Invoke(this, EventArgs.Empty);
 
-    private void Complete(CaptureAction action)
+    private async void Complete(CaptureAction action)
     {
         if (_scrollingSelection) { ScrollCapture_Click(this, new RoutedEventArgs()); return; }
         if (_editor is null) return;
+        if (_qrDetection is { IsCompleted: false } detection)
+        {
+            if (_waitingForQrOutput) return;
+            _waitingForQrOutput = true;
+            try
+            {
+                if (await detection || !ReferenceEquals(_qrDetection, detection) || !IsVisible || _editor is null) return;
+            }
+            finally { _waitingForQrOutput = false; }
+        }
         var output = RenderCaptureImage();
         CaptureAccepted?.Invoke(this, new CaptureResult(output, _screen.Bounds, _pixelSelection.ToDrawingRectangle(), action));
     }
@@ -788,7 +802,11 @@ public partial class SelectionWindow : Window
     private BitmapSource RenderCaptureImage()
     {
         AnnotationView.CommitInlineEdit();
-        var output = _skia.Render(_editor!.Image, _editor.Annotations);
+        return ApplyCaptureMask(_skia.Render(_editor!.Image, _editor.Annotations));
+    }
+
+    private BitmapSource ApplyCaptureMask(BitmapSource output)
+    {
         if (_shape == SelectionShape.Ellipse) output = _skia.ApplySelectionMask(output, [], true);
         else if (_shape is SelectionShape.Lasso or SelectionShape.Polygon)
         {

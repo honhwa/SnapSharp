@@ -14,6 +14,41 @@ namespace NimCap.Screenshot.Services;
 
 internal static class RecognitionSelfTest
 {
+    internal static string TestCaptureQr()
+    {
+        const string website = "https://example.com/path?q=nimcap#test";
+        const string plainText = "NimCap screenshot test";
+        var recognition = new LocalRecognitionService();
+        string? Decode(string content, BarcodeFormat format)
+        {
+            var barcode = new BarcodeWriterPixelData { Format = format, Options = new EncodingOptions { Width = 400, Height = 300 } }.Write(content);
+            var bitmap = BitmapSource.Create(barcode.Width, barcode.Height, 96, 96, PixelFormats.Bgra32, null, barcode.Pixels, barcode.Width * 4);
+            bitmap.Freeze();
+            return recognition.ReadQrCode(bitmap, true).GetAwaiter().GetResult();
+        }
+
+        Require(Decode(website, BarcodeFormat.QR_CODE) == website, "Screenshot QR URL decode failed.");
+        Require(Decode(plainText, BarcodeFormat.QR_CODE) == plainText, "Screenshot QR text decode failed.");
+        Require(Decode(plainText, BarcodeFormat.CODE_128) is null, "A regular barcode triggered screenshot QR handling.");
+        foreach (var text in new[] { plainText, "file:///C:/Windows", "myapp://open", "https://", "https://example.com and more" })
+            Require(CaptureQrActions.WebUrl(text) is null, "Non-web QR payload offered to browser.");
+        Require(CaptureQrActions.WebUrl("http://example.com/") is not null, "HTTP website rejected.");
+
+        var steps = new List<string>();
+        void Verify(string text, bool allow, bool isWebsite, string[] expected)
+        {
+            steps.Clear();
+            var result = CaptureQrActions.Handle(text, url => { steps.Add("prompt:" + url.AbsoluteUri); return allow; },
+                copied => steps.Add("copy:" + copied), () => steps.Add("close"),
+                url => steps.Add("open:" + url.AbsoluteUri), _ => steps.Add("status"));
+            Require(result == (isWebsite, true) && steps.SequenceEqual(expected), "Unexpected screenshot QR action sequence: " + string.Join(", ", steps));
+        }
+        Verify(website, true, true, ["prompt:" + website, "copy:" + website, "close", "open:" + website]);
+        Verify(website, false, true, ["prompt:" + website, "copy:" + website, "status"]);
+        Verify(plainText, false, false, ["copy:" + plainText, "status"]);
+        return "PASS: QR text and web URL decoding, non-QR rejection, confirmation closes capture before opening, decline copies without closing.";
+    }
+
     internal static string TestSpecialistModels(string? source, string device)
     {
         var root = Path.Combine(AppPaths.Root, "models");

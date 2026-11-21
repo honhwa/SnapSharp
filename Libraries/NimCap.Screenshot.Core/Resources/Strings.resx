@@ -3923,6 +3923,8 @@ Barcode</value></data>
   <data name="CaptureSummaryEmptyResult" xml:space="preserve"><value>The model returned no summary. Please retry.</value></data>
   <data name="CaptureSummaryTimedOut" xml:space="preserve"><value>Summary timed out. Your screenshot is preserved; you can retry.</value></data>
   <data name="CaptureSummaryCopied" xml:space="preserve"><value>Summary copied to clipboard.</value></data>
+  <data name="CaptureQrOpenLink" xml:space="preserve"><value>A QR code contains this website address:&#10;&#10;{0}&#10;&#10;Open it in your default browser?</value></data>
+  <data name="CaptureQrCopied" xml:space="preserve"><value>QR code content copied to clipboard.</value></data>
   <data name="RecognitionOcrHint" xml:space="preserve"><value>Recognize text in the image. Edit the result, translate it, or compare the original and translation.</value></data>
   <data name="RecognitionSummaryHint" xml:space="preserve"><value>Recognize the image text, then generate a local summary. Expand Original to review the source; copy or export the summary below.</value></data>
   <data name="RecognitionBarcodeHint" xml:space="preserve"><value>Decode QR codes and barcodes locally. Review and edit the decoded content, then copy or export it.</value></data>

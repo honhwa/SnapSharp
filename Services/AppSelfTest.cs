@@ -13,6 +13,8 @@ internal static class AppSelfTest
 {
     internal static bool TryRun(Application app, string[] args)
     {
+        if (args is ["--capture-qr-self-test", var qrOutput])
+            return Report(app, Path.GetFullPath(qrOutput), RecognitionSelfTest.TestCaptureQr);
         if (args is ["--shell-self-test", var shellOutput])
         {
             var directory = Path.GetFullPath(shellOutput);

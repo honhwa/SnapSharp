@@ -211,14 +211,32 @@ public sealed partial class LocalRecognitionService
         return positions;
     }
 
+    public Task<string?> ReadQrCode(BitmapSource image, bool autoRotate, CancellationToken token = default) => Task.Run(() =>
+    {
+        token.ThrowIfCancellationRequested();
+        var input = Math.Max(image.PixelWidth, image.PixelHeight) > 4096 ? _images.CreateThumbnail(image, 4096) : image;
+        var reader = new BarcodeReaderGeneric { AutoRotate = autoRotate, Options = new DecodingOptions
+        { PossibleFormats = [BarcodeFormat.QR_CODE] } };
+        var text = reader.Decode(BarcodePixels(input), input.PixelWidth, input.PixelHeight, RGBLuminanceSource.BitmapFormat.BGRA32)?.Text;
+        token.ThrowIfCancellationRequested();
+        return text;
+    }, token);
+
+    private static byte[] BarcodePixels(BitmapSource input)
+    {
+        var converted = new FormatConvertedBitmap(input, PixelFormats.Bgra32, null, 0);
+        var pixels = new byte[input.PixelWidth * input.PixelHeight * 4];
+        converted.CopyPixels(pixels, input.PixelWidth * 4, 0);
+        return pixels;
+    }
+
     public Task<RecognitionDocument> Barcodes(BitmapSource image, AppSettings settings, CancellationToken token = default) => Task.Run(() =>
     {
         OnnxImageRuntime.ValidateImage(image); token.ThrowIfCancellationRequested();
-        var input = _images.CreateThumbnail(image, 2048); var converted = new FormatConvertedBitmap(input, PixelFormats.Bgra32, null, 0);
-        var pixels = new byte[input.PixelWidth * input.PixelHeight * 4]; converted.CopyPixels(pixels, input.PixelWidth * 4, 0);
+        var input = _images.CreateThumbnail(image, 2048);
         var reader = new BarcodeReaderGeneric { AutoRotate = settings.BarcodeRotate, Options = new DecodingOptions
         { TryHarder = false, PossibleFormats = [BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128, BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.CODE_39, BarcodeFormat.UPC_A] } };
-        var result = reader.DecodeMultiple(pixels, input.PixelWidth, input.PixelHeight, RGBLuminanceSource.BitmapFormat.BGRA32) ?? [];
+        var result = reader.DecodeMultiple(BarcodePixels(input), input.PixelWidth, input.PixelHeight, RGBLuminanceSource.BitmapFormat.BGRA32) ?? [];
         token.ThrowIfCancellationRequested();
         var scale = image.PixelWidth / (double)input.PixelWidth;
         return new RecognitionDocument(result.Take(64).Select(item =>

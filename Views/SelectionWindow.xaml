@@ -50,6 +50,8 @@
       <StackPanel>
         <TextBlock x:Name="InfoText" Foreground="{DynamicResource OverlayTextBrush}" FontFamily="Consolas" FontSize="12" />
         <TextBlock x:Name="MovementHintText" Foreground="{DynamicResource OverlayTextBrush}" FontSize="11" Visibility="Collapsed" />
+        <TextBlock x:Name="QrStatusText" Foreground="{DynamicResource OverlayTextBrush}" Visibility="Collapsed"
+                   MaxWidth="300" TextWrapping="Wrap" Margin="0,3,0,0" />
       </StackPanel>
     </Border>
 
