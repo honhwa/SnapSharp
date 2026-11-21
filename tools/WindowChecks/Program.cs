@@ -105,6 +105,22 @@ internal static partial class Program
         if (!condition) throw new InvalidOperationException(message);
     }
 
+    private static void WaitForCaptureOutput(Func<bool> hasOutput)
+    {
+        if (hasOutput()) return;
+        var frame = new System.Windows.Threading.DispatcherFrame();
+        var deadline = System.Diagnostics.Stopwatch.StartNew();
+        var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(20) };
+        timer.Tick += (_, _) =>
+        {
+            if (hasOutput() || deadline.Elapsed >= TimeSpan.FromSeconds(5)) frame.Continue = false;
+        };
+        timer.Start();
+        try { System.Windows.Threading.Dispatcher.PushFrame(frame); }
+        finally { timer.Stop(); }
+        Require(hasOutput(), "The overlay did not produce capture output within five seconds.");
+    }
+
     private static object? Invoke(object target, string method, params object?[] arguments) =>
         target.GetType().GetMethod(method, PrivateInstance)!.Invoke(target, arguments);
 }

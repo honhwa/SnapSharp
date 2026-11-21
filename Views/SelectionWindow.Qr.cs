@@ -23,8 +23,8 @@ public partial class SelectionWindow
 
     private void ScanSelectionQr()
     {
-        if (_scrollingSelection || _editor is null || !IsVisible) return;
         CancelQrScan();
+        if (_scrollingSelection || _editor is null || !IsVisible || !IsActive) return;
         _qrDetection = ScanSelectionQrAsync(_editor.Image);
     }
 

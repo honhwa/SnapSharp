@@ -80,6 +80,7 @@ internal static partial class Program
                     CaptureResult? capture = null;
                     overlay.CaptureAccepted += (_, result) => capture = result;
                     Invoke(overlay, "Complete", CaptureAction.Copy);
+                    WaitForCaptureOutput(() => capture is not null);
                     Require(capture?.PixelRegion == new System.Drawing.Rectangle(101, 119, 301, 199), "Output ignored the nudged selection.");
                     var outputPixel = new byte[4]; var sourcePixel = new byte[4];
                     capture!.Image.CopyPixels(new Int32Rect(0, 0, 1, 1), outputPixel, 4, 0);

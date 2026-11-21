@@ -131,6 +131,7 @@ internal static partial class Program
             }
             Invoke(overlay, "BeginInlineEditing");
             Invoke(overlay, "Complete", CaptureAction.Copy);
+            WaitForCaptureOutput(() => accepted is not null);
             Require(accepted?.PixelRegion == new Rectangle(769, 23, 104, 88) && accepted.ScreenBounds == backend.Desktop.Bounds,
                 "Production output clipped the selection at the starting monitor.");
             var source = new CroppedBitmap(backend.Desktop.Image, new Int32Rect(769, 23, 104, 88));

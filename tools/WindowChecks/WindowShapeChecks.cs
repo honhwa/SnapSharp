@@ -59,6 +59,7 @@ internal static partial class Program
                 "Element editing still uses the rectangular desktop crop.");
             CaptureResult? accepted = null; overlay.CaptureAccepted += (_, result) => accepted = result;
             Invoke(overlay, "Complete", CaptureAction.Copy);
+            WaitForCaptureOutput(() => accepted is not null);
             Require(accepted is not null && Alpha(accepted.Image, 379, 319) == 0,
                 "Final element export loses window transparency.");
             var png = new PngBitmapEncoder(); png.Frames.Add(BitmapFrame.Create(accepted!.Image));
