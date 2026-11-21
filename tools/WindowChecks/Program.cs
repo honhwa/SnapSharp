@@ -15,6 +15,9 @@ internal static partial class Program
     {
         Directory.CreateDirectory(Root);
         var app = new System.Windows.Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+        // These checks invoke WPF handlers before the application enters its usual dispatcher loop.
+        var previousContext = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(new System.Windows.Threading.DispatcherSynchronizationContext(app.Dispatcher));
         try
         {
             // Load production styles without starting App's tray/controller or touching user data.
@@ -97,7 +100,11 @@ internal static partial class Program
             return 0;
         }
         catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
-        finally { app.Shutdown(); }
+        finally
+        {
+            app.Shutdown();
+            SynchronizationContext.SetSynchronizationContext(previousContext);
+        }
     }
 
     private static void Require(bool condition, string message)
