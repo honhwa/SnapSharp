@@ -49,6 +49,8 @@
     <ProjectReference Include="Libraries\NimCap.Screenshot.PluginHost\NimCap.Screenshot.PluginHost.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="Cli\**\*.cs" />
+    <Compile Remove="tools\CliChecks\**\*.cs" />
     <Compile Remove="Libraries\**\*.cs" />
     <Compile Remove="tools\RegressionChecks\**\*.cs" />
     <Compile Remove="tools\ScrollingChecks\**\*.cs" />

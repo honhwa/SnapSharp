@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
+    <UseWPF>true</UseWPF>
+    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>nimcap</AssemblyName>
+    <RootNamespace>NimCap.Screenshot.Cli</RootNamespace>
+    <ApplicationManifest>..\app.manifest</ApplicationManifest>
+    <Version Condition="'$(NimCapCliVersion)' == ''">1.1.6</Version>
+    <Version Condition="'$(NimCapCliVersion)' != ''">$(NimCapCliVersion)</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Update="Microsoft.NETCore.App;Microsoft.WindowsDesktop.App;Microsoft.WindowsDesktop.App.WPF"
+                        RuntimeFrameworkVersion="10.0.14" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="NimCap.Screenshot.CliChecks" />
+    <None Include="..\docs\CLI.md" Link="CLI.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <ProjectReference Include="..\Libraries\NimCap.Screenshot.Capture\NimCap.Screenshot.Capture.csproj" />
+    <ProjectReference Include="..\Libraries\NimCap.Screenshot.Infrastructure\NimCap.Screenshot.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

@@ -44,10 +44,18 @@ try {
         '--self-contained', 'true', '-o', $publishDirectory, '-m:1',
         '-p:UseSharedCompilation=false', '-p:PublishSingleFile=false', '-p:PublishTrimmed=false',
         "-bl:$buildRoot/publish.binlog")
+    # Both entry points use the same pinned runtime and library dependencies.
+    Invoke-DotNet @('publish', 'Cli/NimCap.Screenshot.Cli.csproj', '-c', 'Release', '-r', 'win-x64',
+        '--self-contained', 'true', '-o', $publishDirectory, '-m:1',
+        "-p:NimCapCliVersion=$projectVersion", '-p:UseSharedCompilation=false',
+        '-p:PublishSingleFile=false', '-p:PublishTrimmed=false', "-bl:$buildRoot/cli-publish.binlog")
+    Invoke-DotNet @('run', '--project', 'tools/CliChecks/CliChecks.csproj', '-c', 'Release', '--no-build',
+        '--', '--cli', (Join-Path $publishDirectory 'nimcap.exe'))
 
     $required = @(
         'NimCap.Screenshot.exe', 'NimCap.Screenshot.dll', 'NimCap.Screenshot.deps.json',
         'NimCap.Screenshot.runtimeconfig.json', 'coreclr.dll', 'hostfxr.dll',
+        'nimcap.exe', 'nimcap.dll', 'nimcap.deps.json', 'nimcap.runtimeconfig.json', 'CLI.md',
         'LICENSE', 'README.md', 'THIRD-PARTY-NOTICES.md',
         'ThirdPartyLicenses/PACKAGE-NOTICES.md', 'ThirdPartyLicenses/DirectML-LICENSE.txt'
     )
@@ -60,6 +68,10 @@ try {
     $fileVersion = [Version][Diagnostics.FileVersionInfo]::GetVersionInfo($executable).FileVersion
     if ($fileVersion -ne [Version]"$projectVersion.0") {
         throw "Executable version $fileVersion does not match $projectVersion."
+    }
+    $cliVersion = & (Join-Path $publishDirectory 'nimcap.exe') --version
+    if ($LASTEXITCODE -ne 0 -or $cliVersion -cne $projectVersion) {
+        throw "CLI version $cliVersion does not match project version $projectVersion."
     }
     $forbiddenExtensions = @('.onnx', '.gguf', '.safetensors', '.traineddata', '.pt', '.pth', '.pfx', '.p12', '.key')
     $forbiddenNames = @('settings.json', 'data-location.json', '.env', 'secrets.json')
@@ -89,7 +101,7 @@ try {
     }
     if ($env:GITHUB_STEP_SUMMARY) {
         @('## Windows x64 build', "Version: $projectVersion", "Package: $packageName", "SHA256: $digest",
-            '', 'Checks: solution build, offline updater regression, mixed-DPI coordinate fixtures.',
+            '', 'Checks: solution build, offline updater regression, mixed-DPI coordinate fixtures, published CLI contract and worker cleanup.',
             'Real capture, GPU models, microphone, and camera require separate hardware validation.') |
             Out-File -LiteralPath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
     }

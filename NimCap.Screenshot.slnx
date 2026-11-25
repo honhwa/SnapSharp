@@ -8,6 +8,8 @@
   <Project Path="tools/WindowChecks/WindowChecks.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="Cli/NimCap.Screenshot.Cli.csproj" />
+  <Project Path="tools/CliChecks/CliChecks.csproj" />
   <Folder Name="/Libraries/">
     <Project Path="Libraries/NimCap.Screenshot.Core/NimCap.Screenshot.Core.csproj" />
     <Project Path="Libraries/NimCap.Screenshot.Imaging/NimCap.Screenshot.Imaging.csproj" />

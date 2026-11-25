@@ -458,6 +458,16 @@ NimCap Screenshot checks GitHub Releases once on each launch and reports whether
 
 Update backups and installation results are stored under `NimCap.Screenshot-updates/<update-id>/` in the system temporary folder. If installation fails, the helper attempts to restore replaced files and restart the previous app; this rollback covers installation failures, not a health check of the new version.
 
+## CLI automation
+
+For scripted screenshots, use the independent `nimcap.exe` included in the portable package:
+
+```powershell
+.\nimcap.exe capture --full --output .\screen.png --json
+```
+
+It supports physical rectangles, foreground or specified windows, monitor capture, overwrite control, timeout, cancellation and machine-readable results. Discover targets with `windows --json` and `monitors --json`; select a unique window with `--process name` and/or `--window-title text`. Multiple matches fail explicitly. `doctor --backend auto --json` tests desktop access, current-directory writes and real capture. An interactive desktop is required. See [CLI automation and English quick reference](CLI.md).
+
 ## 11. License
 
 Copyright 2026 leelongjiang and NimCap Screenshot contributors

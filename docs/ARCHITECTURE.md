@@ -31,6 +31,7 @@ NimCap Screenshot 是 Windows 桌面截图工具。主截图链路必须保持�
 | `NimCap.Screenshot.Plugin.Abstractions` | 图像处理、识别、输出和工作流动作的稳定契约 | 无其他 NimCap Screenshot 项目 |
 | `NimCap.Screenshot.PluginHost` | 插件发现、强名称策略、独立加载上下文和能力注册表 | `Plugin.Abstractions` |
 | `NimCap Screenshot` | WPF 视图、托盘、热键、单实例、录屏编排、在线服务授权和应用生命周期 | 上述运行时项目；窗口捕获排除仍直接使用 ScreenRecorderLib |
+| `nimcap`（`Cli`） | 独立控制台入口、参数校验、捕获子进程、JSON 结果和原子文件输出 | `Capture`、`Infrastructure`，传递引用 `Core`、`Imaging` |
 
 依赖方向保持为 Shell 指向功能类库。功能类库不得反向引用主程序、`Views` 或具体窗口。
 
@@ -44,6 +45,10 @@ NimCap Screenshot 是 Windows 桌面截图工具。主截图链路必须保持�
 4. 捕获前临时隐藏 NimCap Screenshot 自身窗口，避免应用界面进入截图。
 
 `LaunchCommand` 已解析 `-region`、`-full`、`-window`、`-delay` 和 `-clip`。当前 `CopyToClipboard` 尚未传入输出决策，因此 `-clip` 只完成了解析和转发，不是完整无交互剪贴板流程。
+
+独立 `nimcap.exe capture` 使用 `CliCommand`，与桌面启动参数分离。父进程校验参数和输出冲突，启动隐藏的 STA 捕获子进程，通过重定向标准输入发送请求、二进制标准输出接收图像及物理边界。取消或超时终止子进程树，父进程通过 `OutputFileService.Write` 原子提交显式目标文件，再输出 JSON 或路径并退出。CLI 不创建 `AppController`，不加载设置或写入历史；已有 GUI 窗口也不会被主动隐藏。协议、退出码及运行限制见 [CLI](CLI.md)。
+
+`DesktopInventory` 为 `windows`、`monitors` 与捕获选择器提供统一快照；显示器 DPI 复用捕获库内部 `DisplayMonitorService`，通过定向友元程序集访问，不扩大公共 API。窗口进程/标题筛选及显示器编号在 STA 子进程内、延时之后解析。`doctor` 单独报告桌面打开、目录临时写入和各后端的真实 1×1 内存捕获/编码探针；探针复用同一进程协议，每项有独立期限，部分失败不会被自动回退结果掩盖。
 
 ### 3.2 捕获
 

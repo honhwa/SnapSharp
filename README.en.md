@@ -10,6 +10,8 @@ NimCap Screenshot is an open-source Windows desktop tool combining **screenshots
 
 The application is part of `nimcap` and was formerly called SnapSharp. Its primary GitHub repository is `nimcap/nimcap-screenshot`; the Gitee mirror retains the legacy repository name. Built with C#, WPF, and .NET 10 for Windows x64, it is accessed through the notification area and global shortcuts. See the [migration notes](#upgrade) for legacy upgrades and data-folder selection.
 
+The new standalone **`nimcap.exe` CLI** supports scripted screenshots, window and monitor discovery, and environment diagnostics. See the [CLI guide and English quick reference](docs/CLI.md) for full usage and examples.
+
 ## What offline AI can do
 
 | Task | Local processing | Result |
@@ -37,7 +39,7 @@ For a computer without internet access, prepare the application, models, and run
 
 **Local processing and online features have separate controls.** Online translation and image search are disabled by default and require confirmation for every request after being enabled. Model downloads and update checks also use the network. Offline AI means inference can run without the internet; it does not mean the application never makes network requests. History images are stored locally without encryption. See [configuration and dependencies](docs/配置与依赖.md) for storage, model management, and data migration.
 
-[Software tour](#software) · [Get started](#start) · [First-time setup](#settings) · [Documentation and development](#development)
+[Software tour](#software) · [Get started](#start) · [First-time setup](#settings) · [CLI automation](#cli) · [Documentation and development](#development)
 
 <a id="software"></a>
 
@@ -204,6 +206,23 @@ Preserve the existing data folder and `data-location.json` during a manual upgra
 Windows 10 version 2004 or later, or Windows 11, x64 is required. Self-contained releases include .NET; framework-dependent builds require the matching .NET 10 Desktop Runtime. Recording may require VC++ x64 and Windows media components.
 
 ONNX image inference runs in a separate worker process. GPU initialization/inference failures or insufficient video-memory budget can fall back to CPU when conditions allow. Vulkan failures in local translation do not automatically switch to CPU. See [configuration and dependencies](docs/配置与依赖.md) for model/device limits, and the [user guide](docs/UserGuide.en.md#faq) for troubleshooting.
+
+<a id="cli"></a>
+
+## CLI automation
+
+The portable package includes `nimcap.exe` for desktop, rectangle, monitor and window capture, window/monitor discovery, process/title selection and environment diagnostics, with JSON results, exit codes, timeout and cancellation:
+
+```powershell
+.\nimcap.exe capture --full --output .\screen.png --json
+.\nimcap.exe capture --rect "0,0,1280,720" --output .\region.png --json
+.\nimcap.exe windows --json
+.\nimcap.exe monitors --json
+.\nimcap.exe capture --monitor 1 --output .\primary.png --json
+.\nimcap.exe doctor --backend auto --json
+```
+
+An accessible interactive Windows desktop is required. See the [CLI guide and English quick reference](docs/CLI.md) for options, exit codes and checks.
 
 <a id="development"></a>
 
