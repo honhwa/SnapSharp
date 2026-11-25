@@ -240,6 +240,7 @@ ONNX 图像推理在独立子进程中执行；GPU 初始化、推理失败或�
 ## 反馈与联系
 
 欢迎反馈使用问题和功能建议。请统一通过主仓库的 [GitHub Issues](https://github.com/nimcap/nimcap-screenshot/issues) 提交，并附上软件版本、Windows 版本、复现步骤和必要截图。
+
 QQ群
 <img width="238" height="250" alt="NimCap群聊二维码" src="https://github.com/user-attachments/assets/bdfdbcb5-ea16-4e45-8e0a-42fc8edf2450" />
 
