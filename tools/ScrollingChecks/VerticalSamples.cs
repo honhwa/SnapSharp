@@ -6,6 +6,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using NimCap.Screenshot.Models;
 using NimCap.Screenshot.Services;
+using Brushes = System.Windows.Media.Brushes;
+using FlowDirection = System.Windows.FlowDirection;
+using Point = System.Windows.Point;
 
 namespace NimCap.Screenshot.RegressionChecks;
 
@@ -42,6 +45,7 @@ internal static partial class Program
         var images = new SkiaImageService(); var stitcher = new ScrollingStitcher();
         foreach (var manifest in manifests)
         {
+            var artifactName = Path.GetFileName(Path.GetDirectoryName(manifest)) + "-" + Path.GetFileNameWithoutExtension(manifest);
             var sample = JsonSerializer.Deserialize<VerticalSample>(File.ReadAllText(manifest))!;
             Require(!string.IsNullOrWhiteSpace(sample.Application) && !string.IsNullOrWhiteSpace(sample.Version) &&
                 !string.IsNullOrWhiteSpace(sample.Scenario) && sample.Frames.Length >= 2 && sample.Frames.Length <= 80 &&
@@ -65,14 +69,14 @@ internal static partial class Program
             var expectedCount = firstUncertain < 0 ? frames.Length : firstUncertain + 2;
             Require(captured.Frames.Count == expectedCount && driver.Ended &&
                 (firstUncertain < 0 || captured.Offsets[^1] == 0), "Real-sample capture handoff failed: " + manifest);
-            var projects = new ScrollProjectService(); var projectPath = Path.Combine(Root, Path.GetFileNameWithoutExtension(manifest) + ".ssscroll");
+            var projects = new ScrollProjectService(); var projectPath = Path.Combine(Root, artifactName + ".ssscroll");
             projects.Save(projectPath, new(captured, sample.Trim, new()));
             Require(projects.Load(projectPath).Session.Frames.Count == expectedCount, "Application originals lost in project.");
             var session = new ScrollCaptureSession(frames, sample.ExpectedOffsets,
                 matches.Select((m, i) => m with { Offset = sample.ExpectedOffsets[i], ManuallyAdjusted = !m.Reliable }).ToArray(), ScrollDirection.Vertical, sample.Scenario);
             var output = stitcher.Stitch(session, sample.Trim).Image;
             if (sample.ExpectedImage is not null) AssertVerticalPixels(output, Load(sample.ExpectedImage), sample.Scenario);
-            images.Save(output, Path.Combine(Root, Path.GetFileNameWithoutExtension(manifest) + ".png"));
+            images.Save(output, Path.Combine(Root, artifactName + ".png"));
             Console.WriteLine($"PASS reviewed sample: {sample.Application} {sample.Version}: {sample.Scenario}");
         }
     }

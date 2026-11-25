@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8">
+<style>html{scroll-behavior:auto}body{margin:0;overflow-x:hidden;background:white}
+canvas{display:block}header{position:fixed;top:0;left:0;right:0;height:40px;background:#225588;color:white;z-index:2}</style>
+<header>Local vertical capture acceptance: fixed navigation (excluded from content)</header>
+<canvas id="article" width="720" height="3600"></canvas>
+<script>
+const c=article.getContext('2d');c.fillStyle='white';c.fillRect(0,0,720,3600);
+for(let y=0;y<3600;y++){c.fillStyle=`rgb(${y%256},${Math.floor(y/256)},127)`;c.fillRect(0,y,24,1)}
+c.font='16px Arial';
+for(let i=0;i<150;i++){c.fillStyle='#222';c.fillText(`Row ${i}: ${i*7919} / public local acceptance paragraph ${i%7}`,32,i*24+18);
+c.fillStyle=`hsl(${i*47%360},65%,60%)`;c.fillRect(620,i*24,80,16)}
+function status(){document.title='NimCapLive-e6917c1da5db4935ab8f76aa0264e7db|'+JSON.stringify({y:scrollY,dpr:devicePixelRatio,w:innerWidth,h:innerHeight})}
+addEventListener('scroll',status);addEventListener('resize',status);status();
+</script>

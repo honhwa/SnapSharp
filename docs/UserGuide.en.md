@@ -221,7 +221,7 @@ Open **Image Tools** from the capture toolbar or a pin's context menu.
 <p align="center">
   <img src="../Screenshot/2.png" alt="NimCap Screenshot OCR, barcode, table, formula, and background-removal modes" width="900">
 </p>
-<p align="center"><em>Use one window for text OCR, barcodes, tables, formulas, and one-click background removal.</em></p>
+<p align="center"><em>Use one window for text OCR, identity documents, barcodes, tables, formulas, background removal, and watermark removal.</em></p>
 
 1. Copy image content from a browser, chat application, or another program. Copy the image itself, not only its URL or file path.
 2. Choose **Pins** from the tray, or press the default shortcut `Ctrl+Shift+V`.
@@ -450,14 +450,6 @@ Screenshot history is not encrypted. History images, scrolling-capture projects,
 
 For everyday use, start with **keyboard shortcut → annotate directly → copy or save**. To process an existing image, pin it to the desktop and open **Image Tools** from the pin's context menu.
 
-## Startup Update Checks
-
-**SnapSharp v1.1.3 and earlier require a manual upgrade using the complete new package.** Download the Windows x64 archive for v1.1.4 or later from [GitHub Releases](https://github.com/nimcap/nimcap-screenshot/releases), extract it fully, and run `NimCap.Screenshot.exe`. Future updates can use the new in-app updater. Preserve the data folder and `data-location.json` beside the executable, and check the [data-folder selection rules](#data-directory). See the [v1.1.4 release notes](releases/v1.1.4.md) for details of the rename.
-
-NimCap Screenshot checks GitHub Releases once on each launch and reports whether a new stable version is available. It does not poll during use. **Settings → About** reuses that result; click **Check for updates** to request another check explicitly. Release notes are no longer embedded below the status. A new release can be downloaded and verified before you confirm restarting to install it.
-
-Update backups and installation results are stored under `NimCap.Screenshot-updates/<update-id>/` in the system temporary folder. If installation fails, the helper attempts to restore replaced files and restart the previous app; this rollback covers installation failures, not a health check of the new version.
-
 ## CLI automation
 
 For scripted screenshots, use the independent `nimcap.exe` included in the portable package:
@@ -467,6 +459,18 @@ For scripted screenshots, use the independent `nimcap.exe` included in the porta
 ```
 
 It supports physical rectangles, foreground or specified windows, monitor capture, overwrite control, timeout, cancellation and machine-readable results. Discover targets with `windows --json` and `monitors --json`; select a unique window with `--process name` and/or `--window-title text`. Multiple matches fail explicitly. `doctor --backend auto --json` tests desktop access, current-directory writes and real capture. An interactive desktop is required. See [CLI automation and English quick reference](CLI.md).
+
+## Startup Update Checks
+
+**SnapSharp v1.1.3 and earlier require a manual upgrade using the complete new package.** Download the Windows x64 archive for v1.1.4 or later from [GitHub Releases](https://github.com/nimcap/nimcap-screenshot/releases), extract it fully, and run `NimCap.Screenshot.exe`. Future updates can use the new in-app updater. Preserve the data folder and `data-location.json` beside the executable, and check the [data-folder selection rules](#data-directory). See the [v1.1.4 release notes](releases/v1.1.4.md) for details of the rename.
+
+NimCap Screenshot checks GitHub Releases once on each launch and reports whether a new stable version is available. It does not poll during use. **Settings → About → Online Update** reuses that result; click **Check for updates** to request another check explicitly. When a new version is found, choose **Download and Install Update**; you can also open the release page. Release notes are not embedded below the status. Downloads can be canceled. The app verifies SHA256, the complete package structure, and the target version before allowing installation.
+
+After the download, confirm whether to restart and install immediately. Save unfinished edits and settings, and finish recording, scrolling capture, and model downloads first. The independent updater waits for the app to exit, backs up files being replaced, installs into the current application folder, and launches the new version. Saved settings, models, history, and files outside the release package are preserved.
+
+If file replacement fails, the helper restores replaced files and attempts to restart the previous app. If permissions or file locks also prevent rollback, it shows the backup path for recovery. Backups and installation results are stored under `NimCap.Screenshot-updates/<update-id>/` in the system temporary folder. This rollback covers installation failures, not a health check of the new version.
+
+The current user needs write access to the application folder; the updater does not request administrator privileges automatically. Retry later if GitHub is unavailable or rate-limited, checksum information is missing, or disk space is insufficient. A download error does not close the running app before installation.
 
 ## 11. License
 

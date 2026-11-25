@@ -1,0 +1,31 @@
+{
+  "Application": "chrome.exe",
+  "Version": "158.0.8127.37",
+  "Scenario": "manual-reversal; real desktop wheel; absolute document-Y pixel ruler; 96 DPI; fixed header outside region",
+  "Frames": [
+    "manual-reversal-000.png",
+    "manual-reversal-001.png",
+    "manual-reversal-002.png",
+    "manual-reversal-003.png",
+    "manual-reversal-004.png"
+  ],
+  "ExpectedOffsets": [
+    100,
+    100,
+    -100,
+    100
+  ],
+  "ExpectedReliable": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "Trim": {
+    "Left": 0,
+    "Top": 0,
+    "Right": 0,
+    "Bottom": 0
+  },
+  "ExpectedImage": "manual-reversal-output.png"
+}

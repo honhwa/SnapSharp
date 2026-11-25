@@ -1,0 +1,28 @@
+{
+  "Application": "msedge.exe",
+  "Version": "149.0.4022.69",
+  "Scenario": "manual-recapture-upward; real desktop wheel; absolute document-Y pixel ruler; 96 DPI; fixed header outside region",
+  "Frames": [
+    "manual-recapture-upward-000.png",
+    "manual-recapture-upward-001.png",
+    "manual-recapture-upward-002.png",
+    "manual-recapture-upward-003.png"
+  ],
+  "ExpectedOffsets": [
+    -100,
+    100,
+    100
+  ],
+  "ExpectedReliable": [
+    true,
+    true,
+    true
+  ],
+  "Trim": {
+    "Left": 0,
+    "Top": 0,
+    "Right": 0,
+    "Bottom": 0
+  },
+  "ExpectedImage": "manual-recapture-upward-output.png"
+}

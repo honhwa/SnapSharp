@@ -239,9 +239,6 @@ ONNX 图像推理在独立子进程中执行；GPU 初始化、推理失败或�
 
 ## 反馈与联系
 
-欢迎反馈使用问题和功能建议。请统一通过主仓库的 [GitHub Issues](https://github.com/nimcap/nimcap-screenshot/issues) 提交，并附上软件版本、Windows 版本、复现步骤和必要截图。检索旧问题时可同时搜索 `NimCap Screenshot` 和 `SnapSharp`；反馈旧版问题时注明旧名与具体版本，便于关联历史记录。涉及隐私的内容请勿公开，可通过邮箱或微信联系。
-
-- 邮箱：[509918688@qq.com](mailto:509918688@qq.com)
-- 微信号：`nimcap`
+欢迎反馈使用问题和功能建议。请统一通过主仓库的 [GitHub Issues](https://github.com/nimcap/nimcap-screenshot/issues) 提交，并附上软件版本、Windows 版本、复现步骤和必要截图。
 
 Copyright 2026 leelongjiang 与 NimCap Screenshot contributors。项目采用 [Apache License 2.0](LICENSE)，第三方组件与模型的许可分别见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。

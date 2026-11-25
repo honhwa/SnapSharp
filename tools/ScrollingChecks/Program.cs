@@ -1,7 +1,3 @@
-global using Brushes = System.Windows.Media.Brushes;
-global using Color = System.Windows.Media.Color;
-global using FlowDirection = System.Windows.FlowDirection;
-global using Point = System.Windows.Point;
 using System.IO;
 
 namespace NimCap.Screenshot.RegressionChecks;
@@ -17,13 +13,18 @@ internal static partial class Program
         Directory.CreateDirectory(Root);
         try
         {
+            var desktopBrowser = args is ["--desktop-browser", var executable] ? executable : null;
+            using var liveData = desktopBrowser is null ? null : new LiveDataScope(Root);
             if (args is ["--samples", var directory]) { ReplayVerticalSamples(directory); return 0; }
             if (args is ["--browser-sample", var browser]) { CaptureBrowserSample(browser); return 0; }
             if (args is ["--export-sample", var project, var application, var version, var scenario])
             { ExportVerticalSample(project, application, version, scenario); return 0; }
-            if (args.Length > 0) throw new ArgumentException("Use no arguments, --samples DIRECTORY, --browser-sample EXE, or --export-sample PROJECT APPLICATION VERSION SCENARIO.");
-            ScrollingChecks(); VerticalScenarioChecks();
-            ReplayVerticalSamples("tools/ScrollingChecks/Samples/Edge");
+            if (args.Length > 0 && desktopBrowser is null) throw new ArgumentException("Use no arguments, --samples DIRECTORY, --browser-sample EXE, --desktop-browser EXE, or --export-sample PROJECT APPLICATION VERSION SCENARIO.");
+            if (desktopBrowser is null)
+            {
+                ScrollingChecks(); VerticalScenarioChecks();
+                foreach (var samples in Directory.GetDirectories("tools/ScrollingChecks/Samples")) ReplayVerticalSamples(samples);
+            }
             var app = new System.Windows.Application { ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown };
             try
             {
@@ -39,10 +40,11 @@ internal static partial class Program
                 {
                     SynchronizationContext.SetSynchronizationContext(new System.Windows.Threading.DispatcherSynchronizationContext(app.Dispatcher));
                     NimCap.Screenshot.Localization.UiText.SetCulture(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"));
-                    Require(NimCap.Screenshot.Services.ScrollingSelfTest.Run(Root), "Scrolling capture/correction UI workflow failed.");
+                    if (desktopBrowser is not null) LiveVerticalChecks(desktopBrowser);
+                    else Require(NimCap.Screenshot.Services.ScrollingSelfTest.Run(Root), "Scrolling capture/correction UI workflow failed.");
                 }
                 finally { NimCap.Screenshot.Localization.UiText.SetCulture(previous); SynchronizationContext.SetSynchronizationContext(previousContext); }
-                Console.WriteLine("PASS: vertical capture -> unresolved preview -> manual seam -> undo/redo and project workflow.");
+                if (desktopBrowser is null) Console.WriteLine("PASS: vertical capture -> unresolved preview -> manual seam -> undo/redo and project workflow.");
             }
             finally { app.Shutdown(); }
             return 0;

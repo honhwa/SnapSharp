@@ -2,7 +2,7 @@
 
 异常捕获、热键单路径与 ONNX 子进程边界见[异常与推理隔离](异常与推理隔离.md)。
 
-> 最后按代码校准：2026-11-19。本文描述实际模块、运行边界与依赖采用规则；功能验收状态集中在路线图。
+> 文档校准：2026-11-25，基线 v1.1.7 与当前仓库代码。本文描述实际模块、运行边界与依赖采用规则；功能验收状态集中在路线图。
 
 [文档中心](README.md) · [构建与测试](构建与测试.md) · [功能规格与路线图](<NimCap Screenshot 功能规格与路线图.md>)
 
@@ -63,7 +63,7 @@ NimCap Screenshot 是 Windows 桌面截图工具。主截图链路必须保持�
 
 ### 3.3 区域选择与内联编辑
 
-区域模式为每个显示器创建一个 `SelectionWindow`。选区完成后不立即关闭窗口，而是在选区上进入内联编辑：
+区域模式使用一张虚拟桌面快照，并创建一个覆盖虚拟桌面的 `SelectionWindow`。指针与遮罩 DIP 按快照物理边界和实际画布尺寸显式换算，工具栏约束到真实显示器区域。选区完成后不立即关闭窗口，而是在选区上进入内联编辑：
 
 - 支持矩形、椭圆、自由套索和多边形选区。
 - 编辑底图使用原始物理像素裁剪；遮罩、手柄和工具栏使用 WPF DIP。
@@ -173,7 +173,7 @@ PaddleOCR、表格、公式与抠图通过 `OnnxWorker` 在每次操作独立启
 | [Clowd.Clipboard.Wpf](https://www.nuget.org/packages/Clowd.Clipboard.Wpf) | Windows 图像剪贴板兼容 | MIT | 已使用 |
 | [MahApps.Metro.IconPacks.Lucide](https://www.nuget.org/packages/MahApps.Metro.IconPacks.Lucide) | 工具栏图标 | MIT / ISC | 已使用 |
 | [Vortice.Direct3D11](https://www.nuget.org/packages/Vortice.Direct3D11) | WGC 的 D3D11 / WinRT 设备互操作 | MIT | 已使用；DXGI 由依赖关系提供 |
-| [Microsoft.ML.OnnxRuntime.DirectML](https://www.nuget.org/packages/Microsoft.ML.OnnxRuntime.DirectML/1.24.1) | 本地 OCR 与抠图 CPU / DirectML GPU 推理 | MIT，原生依赖另有声明 | 已使用；模型许可独立，OCR 可一键下载 PP-OCRv4，抠图可一键下载 U²-Net 小型版 |
+| [Microsoft.ML.OnnxRuntime.DirectML](https://www.nuget.org/packages/Microsoft.ML.OnnxRuntime.DirectML) | 本地 OCR、表格、公式、抠图与图像修复的 CPU / DirectML GPU 推理 | MIT，原生依赖另有声明 | 已使用；配套模型按需下载，来源、设备限制与模型许可独立维护 |
 | [Microsoft.AI.DirectML](https://www.nuget.org/packages/Microsoft.AI.DirectML) | 主程序复制 DirectML 原生运行库 | 二进制适用 Microsoft DirectML 分发条款；源代码许可与第三方声明另附 | 主程序直接引用，避免依赖系统中的 DirectML.dll；发布包保留原始许可与声明 |
 | [Tesseract](https://www.nuget.org/packages/Tesseract) | 可选离线 OCR 引擎 | Apache-2.0 | 已使用，原生引擎来自 Charles Weld 的 Tesseract NuGet 分发；官方 tessdata_fast 简中／英文字库按需下载并固定 SHA256 校验 |
 | [GTranslate](https://www.nuget.org/packages/GTranslate) | 可选 Google 在线翻译适配器 | MIT | 已使用，包随程序提供；不是离线翻译模型，服务可用性与额度由第三方决定；逐次确认接收地址与文字 |
@@ -188,6 +188,7 @@ PaddleOCR、表格、公式与抠图通过 `OnnxWorker` 在每次操作独立启
 | 组件 | 当前用途 | 许可证 | 采用说明 |
 |---|---|---|---|
 | [llama.cpp](https://github.com/ggml-org/llama.cpp) / [Qwen3.5 GGUF catalog](https://huggingface.co/bartowski) | 本地 CPU / Vulkan GPU 翻译 | MIT / Apache-2.0 | 2B / 4B / 9B / 27B Q4_K_M；27B Q5_K_M 仅在检测到至少 24 GiB 专用显存时显示。固定修订、大小与 SHA256 校验；无 API 费用 |
+| PP-Structure SLANet / LaTeX-OCR | 本地表格结构与公式识别 | Apache-2.0 / MIT，具体权重条款随来源记录 | 已内置 ONNX 适配与一键配置，也可选择插件；模型按需下载，来源与校验见[配置与依赖](配置与依赖.md) |
 
 PaddleOCR、Tesseract 字库及抠图权重的固定来源、大小、SHA256 与适配契约统一维护在[配置与依赖](配置与依赖.md)，实际分发义务见[第三方声明](../THIRD-PARTY-NOTICES.md)。
 
@@ -209,7 +210,6 @@ PaddleOCR、Tesseract 字库及抠图权重的固定来源、大小、SHA256 与
 |---|---|---|---|
 | Windows 11 新 OCR | [Windows AI Text Recognition](https://learn.microsoft.com/windows/ai/apis/text-recognition) | Windows 平台 API | 能力和部署要求高于当前基线，作为可选后端，不替换 Windows 10 路径 |
 | 长截图特征匹配 | [OpenCvSharp4](https://www.nuget.org/packages/OpenCvSharp4) | Apache-2.0 | 当前灰度重叠算法不足时再引入；原生包体积较大，优先保留轻量实现 |
-| 专用表格／公式 | PP-Structure SLANet / LaTeX-OCR | Apache-2.0 / MIT，来源与文件 SHA256 独立记录 | 已内置 ONNX 适配与一键配置，也可选插件；模型按需下载 |
 | 大规模历史索引 | [Microsoft.Data.Sqlite](https://www.nuget.org/packages/Microsoft.Data.Sqlite) | MIT | JSON 在数千条历史记录下成为瓶颈后迁移；先设计 schema 版本和迁移事务 |
 | 独立音频管线 | [NAudio](https://www.nuget.org/packages/NAudio) | MIT | 当前音频由 ScreenRecorderLib 处理；只有独立音频需求时再评估 |
 | 视频编码互操作 | [FFmpeg.AutoGen](https://www.nuget.org/packages/FFmpeg.AutoGen) | MIT（当前包装层） | FFmpeg 二进制仍保留其原始 LGPL/GPL 许可且取决于构建选项；必须单独审查编解码器专利和再分发 |
