@@ -7,7 +7,7 @@
     <AssemblyName>nimcap</AssemblyName>
     <RootNamespace>NimCap.Screenshot.Cli</RootNamespace>
     <ApplicationManifest>..\app.manifest</ApplicationManifest>
-    <Version Condition="'$(NimCapCliVersion)' == ''">1.1.6</Version>
+    <Version Condition="'$(NimCapCliVersion)' == ''">1.1.7</Version>
     <Version Condition="'$(NimCapCliVersion)' != ''">$(NimCapCliVersion)</Version>
   </PropertyGroup>
   <ItemGroup>

@@ -14,7 +14,7 @@
     <PackageProjectUrl>https://jietu.nimcap.com</PackageProjectUrl>
     <Description>NimCap 截图工具</Description>
     <RootNamespace>NimCap.Screenshot</RootNamespace>
-    <Version>1.1.6</Version>
+    <Version>1.1.7</Version>
     <Platforms>x64</Platforms>
     <Platform>x64</Platform>
     <PlatformTarget>x64</PlatformTarget>
